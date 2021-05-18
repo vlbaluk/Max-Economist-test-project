@@ -1,0 +1,51 @@
+type User {
+  id: ID!
+  email: String!
+  post: [Post!]!
+  createdAt: String!
+  updatedAt: String!
+}
+
+type Post {
+  id: ID!
+  title: String!
+  href: String!
+  body: String
+  author: User!
+}
+
+input SignUpInput {
+  email: String!
+  password: String!
+}
+
+input LoginInput {
+  email: String!
+  password: String!
+}
+
+input PostInput {
+  title: String!
+  body: String
+  href: String!
+}
+
+type AuthPayload {
+  id: ID!
+  email: String!
+  token: String!
+}
+
+type Query {
+  post(id: ID!): Post!
+  posts: [Post!]!
+  parsePost(href: String!): Post!
+}
+
+type Mutation {
+  signup(signUpInput: SignUpInput): AuthPayload!
+  login(loginInput: LoginInput): AuthPayload!
+  createPost(postInput: PostInput): Post!
+  createPosts: [Post!]!
+
+}
