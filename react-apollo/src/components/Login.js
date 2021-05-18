@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { gql, useMutation } from '@apollo/client';
 import { useHistory } from 'react-router';
 import { AUTH_TOKEN } from '../constants';
+import {Alert} from "react-bootstrap";
 
 const SIGNUP_MUTATION = gql`
   mutation SignupMutation(
@@ -30,7 +31,8 @@ const Login = () => {
     login: true,
     email: '',
     password: '',
-    name: ''
+    name: '',
+    errors: ''
   });
 
   const [login] = useMutation(LOGIN_MUTATION, {
@@ -70,6 +72,39 @@ const Login = () => {
           alert('Error: '+graphQLErrors[0].message);
       }
   });
+
+    const validate = () => {
+        let errors = {};
+        let isValid = true;
+
+
+        if (!formState.email) {
+            isValid = false;
+            errors["email"] = "Please enter your email Address.";
+        }
+
+        if (typeof formState.email !== "undefined") {
+
+            var pattern = new RegExp(/^(("[\w-\s]+")|([\w-]+(?:\.[\w-]+)*)|("[\w-\s]+")([\w-]+(?:\.[\w-]+)*))(@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$)|(@\[?((25[0-5]\.|2[0-4][0-9]\.|1[0-9]{2}\.|[0-9]{1,2}\.))((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})\.){2}(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})\]?$)/i);
+            if (!pattern.test(formState.email)) {
+                isValid = false;
+                errors["email"] = "Please enter valid email address.";
+            }
+        }
+
+        if (!formState.password || formState.password.length<5) {
+            isValid = false;
+            errors["password"] = "Please enter your password. Should contain at least 5 symbols";
+        }
+
+        setFormState({
+            ...formState,
+            errors: errors
+        })
+
+        return isValid;
+    }
+
   return (
     <div>
       <h4 className="mv3">{login ? 'Login' : 'Sign Up'}</h4>
@@ -113,7 +148,10 @@ const Login = () => {
       <div className="flex mt3">
         <button
           className="pointer mr2 button"
-          onClick={formState.login ? login : signup}
+          onClick={()=>{
+           if(!validate())
+               return ;
+              return formState.login  ? login() : signup()}}
         >
           {formState.login ? 'login' : 'create account'}
         </button>
@@ -131,6 +169,15 @@ const Login = () => {
             : 'already have an account?'}
         </button>
       </div>
+
+        {formState.errors && Object.keys(formState.errors).length > 0 && <Alert  variant="danger">
+            <div>{formState.errors && <>{formState.errors.email}
+            <br/>
+                {formState.errors.password}
+                </>}</div>
+
+        </Alert>}
+
     </div>
   );
 };

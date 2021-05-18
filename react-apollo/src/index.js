@@ -18,8 +18,6 @@ import './styles/index.css';
 
 const httpLink = createHttpLink({
   uri: 'http://localhost:5000/graphql',
-  // credentials: 'include'
-
 });
 
 const authLink = setContext((_, { headers }) => {
